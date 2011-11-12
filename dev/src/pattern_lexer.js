@@ -23,7 +23,13 @@
             SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
             SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
             SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
-            SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
+            SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g'),
+
+            SAVE_TOKEN_REGEXP = new RegExp(
+                SAVE_REQUIRED_PARAMS + '|' +
+                SAVE_OPTIONAL_PARAMS + '|' +
+                SAVE_OPTIONAL_SLASHES + '|' +
+                SAVE_REQUIRED_SLASHES, 'g');
 
 
         function captureVals(regex, pattern) {
@@ -38,13 +44,59 @@
             return captureVals(PARAMS_REGEXP, pattern);
         }
 
+        function getRequiredParamsIds(pattern) {
+            return captureVals(REQUIRED_PARAMS_REGEXP, pattern);
+        }
+
         function getOptionalParamsIds(pattern) {
             return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
         }
 
+        function getNextRequiredParameter(paramIds, values) {
+            var paramId = paramIds.shift();
+            var value = values[paramId];
+            if (!value) throw new Error('Missing parameter "' + paramId + '"');
+            return value;
+        }
+
+        function getNextOptionalParameter(paramIds, values) {
+            var value = values[paramIds.shift()];
+            return value? '/' + value : '';
+        }
+
+        function getOptionalSlash(token, offset, pattern) {
+            var remainingPattern = pattern.substr(offset + token.length);
+            if (remainingPattern === "" ||
+                remainingPattern.indexOf('/') === 0 ||
+                remainingPattern.search(SAVE_TOKEN_REGEXP) === 0)
+            {
+                return '';
+            }
+            return '/';
+        }
+
+        function composePath(pattern, values) {
+            pattern = pattern || '';
+            values = values || {};
+            if (pattern) {
+                var paramIds = getParamIds(pattern);
+                pattern = tokenize(pattern);
+                pattern = pattern.replace(SAVE_TOKEN_REGEXP, function(token, offset, pattern) {
+                    switch (token) {
+                        case SAVE_REQUIRED_PARAMS: return getNextRequiredParameter(paramIds, values) + getOptionalSlash(token, offset, pattern);
+                        case SAVE_OPTIONAL_PARAMS: return getNextOptionalParameter(paramIds, values) + getOptionalSlash(token, offset, pattern);
+                        case SAVE_REQUIRED_SLASHES: return '/';
+                        case SAVE_OPTIONAL_SLASHES: return '';
+                        default: throw new Error("Unexpected token");
+                    }
+                });
+            }
+            return pattern;
+        }
+
         function compilePattern(pattern) {
             pattern = pattern || '';
-            if(pattern){
+            if (pattern) {
                 pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
                 pattern = tokenize(pattern);
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
@@ -84,7 +136,8 @@
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
-            compilePattern : compilePattern
+            compilePattern : compilePattern,
+            composePath : composePath
         };
 
     }());

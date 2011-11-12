@@ -29,6 +29,13 @@
             return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
 
+        linkTo : function (params) {
+            if (!this._pattern) {
+                throw new Error("Cannot link to route with regex pattern");
+            }
+            return patternLexer.composePath(this._pattern, params);
+        },
+
         _validateParams : function (request) {
             var rules = this.rules,
                 values = this._getParamsObject(request),
