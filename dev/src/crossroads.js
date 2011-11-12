@@ -63,6 +63,7 @@
             } else {
                 this.bypassed.dispatch(request);
             }
+            return n > 0;
         },
 
         getNumRoutes : function () {

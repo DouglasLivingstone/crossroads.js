@@ -607,4 +607,18 @@ describe('crossroads.parse()', function(){
 
     });
 
+    describe('parse return value', function(){
+
+        it('shold return true when parse matches a route', function(){
+
+            crossroads.addRoute('/foo');
+            var t1 = crossroads.parse('/foo');
+            var t2 = crossroads.parse('/bar');
+
+            expect( t1 ).toBe( true );
+            expect( t2 ).toBe( false );
+        });
+
+    });
+
 });

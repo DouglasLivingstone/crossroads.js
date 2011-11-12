@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.7.0 - Build: 87 (2011/11/07 03:34 PM)
+ * Version: 0.7.0 - Build: 88 (2011/11/12 03:36 PM)
  */
 
 (function (define) {
@@ -142,6 +142,7 @@ define('crossroads', function (require) {
             } else {
                 this.bypassed.dispatch(request);
             }
+            return n > 0;
         },
 
         getNumRoutes : function () {
