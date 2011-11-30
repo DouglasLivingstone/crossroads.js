@@ -52,6 +52,15 @@ describe('patternLexer', function(){
             expect( params[1] ).toEqual( 'bar' );
         });
 
+        it('should decode uri components', function(){
+            var pattern = '/lorem/{ipsum}/{dolor}',
+                regex = crossroads.patternLexer.compilePattern(pattern),
+                params = crossroads.patternLexer.getParamValues('/lorem/foo%2Fbar/%baz', regex);
+
+            expect( params[0] ).toEqual( 'foo/bar' );
+            expect( params[1] ).toEqual( '%baz' ); // invalid uri components pass-through
+        });
+
     });
 
 

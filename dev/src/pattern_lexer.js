@@ -120,10 +120,33 @@
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }
 
+        function safeDecodeURIComponent(val) {
+            var r = val;
+            if (typeof val === 'string') {
+                try {
+                    r = decodeURIComponent(val);
+                }
+                catch(e) {
+                    // don't manipulate invalid uri components, eg %bfoo
+                }
+            }
+            return r;
+        }
+
+        function safeDecodeURIComponents(vals) {
+            var n = vals.length,
+                result = [];
+            while (n--) {
+                result[n] = safeDecodeURIComponent(vals[n]);
+            }
+            return result;
+        }
+
         function getParamValues(request, regexp, shouldTypecast) {
             var vals = regexp.exec(request);
             if (vals) {
                 vals.shift();
+                vals = safeDecodeURIComponents(vals);
                 if (shouldTypecast) {
                     vals = typecastArrayValues(vals);
                 }
