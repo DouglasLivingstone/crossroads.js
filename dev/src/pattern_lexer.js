@@ -56,12 +56,12 @@
             var paramId = paramIds.shift();
             var value = values[paramId];
             if (!value) throw new Error('Missing parameter "' + paramId + '"');
-            return value;
+            return encodeURIComponent(value);
         }
 
         function getNextOptionalParameter(paramIds, values) {
             var value = values[paramIds.shift()];
-            return value? '/' + value : '';
+            return value? '/' + encodeURIComponent(value) : '';
         }
 
         function getOptionalSlash(token, offset, pattern) {

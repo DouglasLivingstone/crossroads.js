@@ -29,6 +29,12 @@ describe('route.linkTo()', function(){
         expect( r4.linkTo({ foo: 'dolor', bar: 'sit' }) ).toBe( '/lorem-ipsum/dolor/sit/' );
     });
 
+    it('should url encode parameters', function(){
+        var r1 = crossroads.addRoute('/lorem-ipsum/{foo}/:bar:');
+
+        expect( r1.linkTo({ foo: 'do/lor', bar: "a b" }) ).toBe( '/lorem-ipsum/do%2Flor/a%20b' );
+    });
+
     it('should substitute optional parameters', function(){
         var r1 = crossroads.addRoute('/lorem-ipsum/:foo:');
         var r2 = crossroads.addRoute('/lorem-ipsum/:foo:/:bar:');
